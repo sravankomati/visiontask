@@ -5,14 +5,14 @@ module.exports = {
     try {
       const { Subjects } = req.body;
       var existData = await marksSchema.find({ student_id: req.st_id });
-      if (existData) {
+      if (existData.length != 0) {
         var result = [];
         result = existData[0].Subjects.filter(function (cv) {
           return !Subjects.find(function (e) {
             return e.name == cv.name;
           });
         });
-           result.map((res) => {
+        result.map((res) => {
           Subjects.push(res);
         });
       }
@@ -30,7 +30,7 @@ module.exports = {
       } else {
         status = "Pass";
       }
-      if (existData) {
+      if (existData.length != 0) {
         await marksSchema.findByIdAndUpdate(existData[0].id, {
           Subjects,
           Total,
@@ -54,10 +54,14 @@ module.exports = {
   getWithScore: async (req, res) => {
     try {
       const { maxscore } = req.query;
-      const result = await marksSchema
-        .find({ Total: { $gte: Number(maxscore) } }, { student_id: 1 })
-        .populate("student_id", "StudentName");
-      res.json({ "No of students": result.length, "List of students": result });
+      const result = await marksSchema.find(
+        { Total: { $gte: Number(400) } },
+        { student_id: 1 }
+      );
+      // .populate("student_id", "StudentName");
+      const result1 = await marksSchema.find().count();
+      var response2 = result1 - result.length;
+      res.json({ Noofstudents: result.length, notFrom: response2 });
     } catch (error) {
       res.json({ messsage: error.messsage });
     }
@@ -87,22 +91,23 @@ module.exports = {
         //   },
         // },
       ]);
-      var response = [];
-      data.forEach((e) => {
-        var store = [];
-        e.Subjects.find((k) => {
-          if (k.marks == 90) {
-            store.push(k.name);
-          }
-        });
-        if (store.length > 0) {
-          response.push({
-            name: e.Student[0].StudentName,
-            subject: store,
-          });
-        }
-      });
-      res.json({ messsage: "List of students with subject marks", response });
+      var getAllmarks = await marksSchema.find().count()
+      var notEqTo90=getAllmarks-data.length
+      // data.forEach((e) => {
+      //   var store = [];
+      //   e.Subjects.find((k) => {
+      //     if (k.marks == 90) {
+      //       store.push(k.name);
+      //     }
+      //   });
+      //   if (store.length > 0) {
+      //     response.push({
+      //       name: e.Student[0].StudentName,
+      //       subject: store,
+      //     });
+      //   }
+      // });
+      res.json({ "Eqto90":data.length ,notEqTo90});
     } catch (error) {
       res.json({ messsage: error });
     }
@@ -148,11 +153,11 @@ module.exports = {
     }
   },
   geMarks: async (req, res) => {
-    try {
+    try { 
       const result = await marksSchema
-        .find()
+        .find({ student_id: req.st_id })
         .populate("student_id", "StudentName");
-      res.json({ "Student report  card": result });
+      res.json({ StudentReportCard: result });
     } catch (error) {
       res.json({ messsage: error.messsage });
     }

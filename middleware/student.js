@@ -40,13 +40,13 @@ module.exports = {
             res.json({ message: "token is invalid please login again" });
           }
         } catch (error) {
-          res.json({ messahe: error.message });
+          res.json({ err: error.message });
         }
       } else {
-        res.json({ message: "Token must be mention" });
+        res.json({ err: "Token must be mention" });
       }
     } catch (error) {
-      res.json({ message: error.message });
+      res.json({ err: error.message });
     }
   },
   marksvalidate: async (req, res, next) => {

@@ -11,11 +11,11 @@ module.exports = {
       if (checkEmail) {
         res.json({ err: "Email is alreday exist" });
       } else {
-        await Studentmodel.create({
-          StudentName,
-          Email,
-          Password: PasswordGenearte,
-        });
+        // await Studentmodel.create({
+        //   StudentName,
+        //   Email,
+        //   Password: PasswordGenearte,
+        // });
         res.json({ message: "student is Register, you can login now " });
       }
     } catch (error) {
@@ -44,7 +44,12 @@ module.exports = {
   },
   getAllData: async (req, res) => {
     const response = await Studentmodel.find();
-    // res.json({ message: "List of students", response });
-    res.render("studentList", { response, title: "Student List" });
+    res.json({ message: "List of students", response });
+    // res.render("studentList", { response, title: "Student List" });
+  },
+  getAllData1: async (req, res) => {
+    const response = await Studentmodel.find();
+    res.json({ message: "List of students", response });
+    // res.render("studentList", { response, title: "Student List" });
   },
 };

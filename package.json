@@ -10,15 +10,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "authorizenet": "^1.0.8",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "helmet": "^6.0.1",
     "joi": "^17.7.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.3",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "paypal-rest-sdk": "^1.8.1",
+    "stripe": "^11.9.1",
+    "validator": "^13.9.0"
   }
 }

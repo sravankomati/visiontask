@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/toasting.css" />
+    <script src="/js/toasting.js"></script>
+
+    <title>
+        <%=title %>
+    </title>
+    <style>
+        .canvasjs-chart-canvas {
+            width: 466px;
+            height: 370px;
+        }
+
+        body {
+            background: url('https://source.unsplash.com/twukN12EN7c/1920x1080') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            background-size: cover;
+            -o-background-size: cover;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+    <!-- style="background:linear-gradient(to left,pink,orange) ;"  -->
+    <div class="container" style="padding-top: 30px;">
+        <h4 style="text-align: center;">List of Transection </h4>
+        <!-- <a href="/dasboard">Dasboad</a> -->
+        <button onclick="logout()" class="btn btn-warning" style="border-radius: 20px;">Logout</button>
+        <button type="button" class="btn btn-info" data-toggle="modal" style="border-radius: 20px;"
+            data-target="#exampleModal1">
+            payment
+        </button>
+        <a href="/list" class="btn btn-primary" style="border-radius: 20px;">Student list</a>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Transection id</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Payment method</th>
+                    <th scope="col">Currency</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="showall">
+                <% result.forEach((data,i)=> { %>
+                    <tr>
+                        <td>
+                            <%= i+1%>
+                        </td><td>
+                            <%= data.payment_id%>
+                        </td>
+                        <td>
+                            <%= data.username %>
+                        </td>
+                        <td>
+                            <%= data.paymentMethod %>
+                        </td>
+                        <td>
+                            <%= data.currency %>
+                        </td>
+                        <td>
+                            <%= data.amount %>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+<script>
+    function logout() {
+        localStorage.removeItem("id")
+        toasting.create({
+            "title": "success",
+            "type": "success",
+            "text": "Your logout",
+            "progressBarType": "rainbow",
+        });
+        setTimeout(() => {
+            window.location = "/"
+        }, 3000)
+    }
+</script>
+
+</html>

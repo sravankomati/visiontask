@@ -20,15 +20,37 @@
         <%=title %>
     </title>
     <style>
-        #rowAdder {
-            margin-left: 17px;
+        .canvasjs-chart-canvas {
+            width: 466px;
+            height: 370px;
+        }
+
+        body {
+            background: url('https://source.unsplash.com/twukN12EN7c/1920x1080') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            background-size: cover;
+            -o-background-size: cover;
+        }
+
+        .hide {
+            display: none;
         }
     </style>
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
-<body style="background:url(https://www.w3schools.com/cssref/paper.gif) ;">
+<body onload="showdata()">
+    <!-- style="background:linear-gradient(to left,pink,orange) ;"  -->
     <div class="container" style="padding-top: 30px;">
         <h4 style="text-align: center;">List of Students</h4>
+        <!-- <a href="/dasboard">Dasboad</a> -->
+        <button onclick="logout()" class="btn btn-warning" style="border-radius: 20px;">Logout</button>
+        <button type="button" class="btn btn-info" data-toggle="modal" style="border-radius: 20px;"
+            data-target="#exampleModal1">
+            payment
+        </button>
+        <a href="/paymentlist" class="btn btn-primary"  style="border-radius: 20px;">Transection list</a>
         <button style="float: right;border-radius: 20px;" class="btn btn-success btn-rounded" data-toggle="modal"
             data-target="#exampleModal">add <i class="fa-sharp fa-solid fa-address-card"></i> </button>
         <table class="table table-hover">
@@ -39,23 +61,27 @@
                     <th scope="col">Email</th>
                 </tr>
             </thead>
-            <tbody>
-                <% for(var i=0; i < response.length; i++) { %>
-                    <tr>
-                        <td>
-                            <%= i+1 %>
-                        </td>
-                        <td>
-                            <%= response[i].StudentName %>
-                        </td>
-                        <td>
-                            <%= response[i].Email %>
-                        </td>
-                    </tr>
-                    <% } %>
+            <tbody id="showall">
+
             </tbody>
         </table>
     </div>
+    <!-- dashbord -->
+    <div class="container" style="margin-bottom: 25px;">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter"
+            onclick="showHighScore()">Show Students who score
+            high</button>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalCenter"
+            onclick="showHighScoreSubj()">Show students high score
+            each subject</button>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCenter"
+            onclick="showMarksBtw()">show students who score marks in
+            Maths </button>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"
+            onclick="ShowMyReport()">Get Your Report</button>
+        <!-- <a href="/list" class="btn btn-warning">Previous page</a> -->
+    </div>
+
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -88,7 +114,8 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <button type="button" class="btn btn-success add-textbox"><i class="fa-solid fa-plus"></i></button>
+                                    <button type="button" class="btn btn-success add-textbox"><i
+                                            class="fa-solid fa-plus"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -99,11 +126,93 @@
                     <button type="button" class="btn btn-primary" style="
                     width: 100%;
                     border-radius: 20px;
-                " onclick="marksadd()">Submit</button>
+                " onclick="marksadd()" data-dismiss="modal">Submit</button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- modal -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <!-- <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div> -->
+                <div class="modal-body">
+                    <div>
+                        <div class="container" id="chartContainer" style="height: 370px; width: 100%;"></div>
+                        <div
+                            style="margin-top:16px;color:dimgrey;font-size:9px;font-family: Verdana, Arial, Helvetica, sans-serif;text-decoration:none;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- payment form -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">payment Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="container" action="/pay" method="post" id="payment-form">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Username</label>
+                            <input type="text" class="form-control" name="username" id="exampleInputEmail1"
+                                aria-describedby="emailHelp" placeholder="Enter Username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Amount</label>
+                            <input type="number" class="form-control" name="amount" id="exampleInputPassword1"
+                                placeholder="Enter Amount" required>
+                        </div>
+                        <div>
+                            <label for="exampleInputPassword1">Payment </label>
+                            <input type="radio" name="tab" value="igotnone" onclick="show1();" />
+                            paypal
+                            <input type="radio" name="tab" value="igottwo" onclick="show2();" />
+                            Stripe
+                            <input type="radio" name="tab" value="igotthree" onclick="show3();" />
+                            Authorize.net
+                        </div>
+                        <div>
+                            <div id="div1" class="hide">
+                            </div>
+                            <div id="div2" class="hide">
+                            </div>
+                            <div id="div3" class="hide">
+
+                            </div>
+                            <div id="card-errors" role="alert"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- <button type="submit" class="btn btn-primary">Payment</button> -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- payment form -->
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
@@ -113,7 +222,6 @@
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script>
 <script type="text/javascript">
-
     var cnt = 1;
     $(document).ready(function () {
         // var max = 10;
@@ -187,9 +295,18 @@
                             "text": "Your Marks is added",
                             "progressBarType": "rainbow",
                         });
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 3000)
                     }
                 }
             })
+        }
+        else {
+            errmsg("Enter the marks")
+            setTimeout(() => {
+                window.location.reload()
+            }, 3000)
         }
 
     }
@@ -200,6 +317,301 @@
             "progressBarType": "error",
         });
     }
+    function showdata() {
+        var inhtml = ""
+        $.ajax({
+            type: "get",
+            url: "/api/student/getalldata",
+            headers: {
+                Authorization:
+                    localStorage.getItem("id"),
+            },
+            success: (res) => {
+                if (res.err) {
+                    errmsg("get some error try again login")
+                    setTimeout(() => {
+                        window.location = "/"
+                    }, 3000)
+                }
+                else {
+                    const { response } = res
+                    for (let i = 0; i < response.length; i++) {
+                        inhtml += `<tr>
+                        <td>
+                            ${i + 1}
+                        </td>
+                        <td>
+                            ${response[i].StudentName}
+                        </td>
+                        <td>
+                            ${response[i].Email}
+                        </td>
+                    </tr>`
+                    }
+                    document.getElementById("showall").innerHTML = inhtml
+                }
+            }
+        })
+    }
+    function logout() {
+        localStorage.removeItem("id")
+        toasting.create({
+            "title": "success",
+            "type": "success",
+            "text": "Your Logout",
+            "progressBarType": "rainbow",
+        });
+        setTimeout(() => {
+            window.location = "/"
+        }, 3000)
+    }
+</script>
+<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+<script>
+    var options = {
+        title: {
+            text: "Student Report",
+        },
+        subtitles: [
+            {
+                text: "As of February, 2023",
+            },
+        ],
+        animationEnabled: true,
+    }
+    function showHighScore() {
+        $.ajax({
+            type: "get",
+            url: "/api/marks/getWithHighScore",
+            headers: {
+                Authorization:
+                    localStorage.getItem("id"),
+            },
+            success: (res) => {
+                options["data"] = [
+                    {
+                        type: "pie",
+                        startAngle: 40,
+                        toolTipContent: "<b>{label}</b>: {y}%",
+                        showInLegend: "true",
+                        legendText: "{label}",
+                        indexLabelFontSize: 16,
+                        indexLabel: "{label} - {y}%",
+                        dataPoints: [
+                            { y: res.Noofstudents, label: "No Of Student > 400" },
+                            { y: res.notFrom, label: "No Of Student < 400" },
+                        ],
+                    },
+                ]
+                $("#chartContainer").CanvasJSChart(options);
+            }
+        })
+    }
+    function showHighScoreSubj() {
+        $.ajax({
+            type: "get",
+            url: "/api/marks/getWithHighmarks",
+            headers: {
+                Authorization:
+                    localStorage.getItem("id"),
+            },
+            success: (res) => {
+                options["data"] = [
+                    {
+                        type: "pie",
+                        startAngle: 40,
+                        toolTipContent: "<b>{label}</b>: {y}%",
+                        showInLegend: "true",
+                        legendText: "{label}",
+                        indexLabelFontSize: 16,
+                        indexLabel: "{label} - {y}%",
+                        dataPoints: [
+                            { "y": res.Eqto90, "label": "Marks equal to 90" },
+                            { "y": res.notEqTo90, "label": "Marks not equal to 90" },
+                        ]
+                    },
+                ]
+                $("#chartContainer").CanvasJSChart(options);
+            }
+        })
+
+    }
+    function showMarksBtw() {
+        $.ajax({
+            type: "get",
+            url: "/api/marks/getstudentBtw?minmark=70&maxmark=95",
+            headers: {
+                Authorization:
+                    localStorage.getItem("id"),
+            },
+            success: (res) => {
+                console.log(res);
+                const noofstudent = res["No of students"]
+                const response1 = res["List of students"]
+                options["data"] = [
+                    {
+                        type: "pie",
+                        startAngle: 40,
+                        toolTipContent: "<b>{label}</b>: {y}%",
+                        showInLegend: "true",
+                        legendText: "{label}",
+                        indexLabelFontSize: 16,
+                        indexLabel: "{label} - {y}%",
+                        dataPoints: [],
+                    },
+                ]
+                response1.forEach(i => {
+                    options["data"][0]["dataPoints"].push({ "y": i.Subjects.marks, "label": i.Student[0].StudentName })
+                });
+                $("#chartContainer").CanvasJSChart(options);
+            }
+        })
+    }
+    function ShowMyReport() {
+        $.ajax({
+            type: "get",
+            url: "/api/marks/geMarks",
+            headers: {
+                Authorization:
+                    localStorage.getItem("id"),
+            },
+            success: (res) => {
+                const { StudentReportCard } = res
+                options["data"] = [
+                    {
+                        type: "pie",
+                        startAngle: 40,
+                        toolTipContent: `<b>${StudentReportCard[0].student_id.StudentName}</b>:${StudentReportCard[0].status} `,
+                        showInLegend: "true",
+                        legendText: "{label}",
+                        indexLabelFontSize: 16,
+                        indexLabel: "{label} - {y}%",
+                        dataPoints: [
+                        ],
+                    },
+                ]
+                StudentReportCard[0].Subjects.map((i) => {
+                    options["data"][0]["dataPoints"].push({ y: i.marks, label: i.name })
+                })
+                $("#chartContainer").CanvasJSChart(options);
+            }
+        })
+    }
+
+</script>
+<script>
+    function show1() {
+        document.getElementById('div1').innerHTML = ""
+        document.getElementById('div3').innerHTML = ""
+        document.getElementById('div1').style.display = 'block';
+        document.getElementById('div2').style.display = 'none';
+        document.getElementById('div3').style.display = 'none';
+        document.getElementById('div1').innerHTML = ` <button type="submit" class="btn btn-primary">paypal</button>`
+
+    }
+    function show2() {
+        document.getElementById('div2').style.display = 'block';
+        document.getElementById('div1').style.display = 'none';
+        document.getElementById('div3').style.display = 'none';
+        document.getElementById('div3').innerHTML = ""
+        // Create a Stripe client.
+        var stripe = Stripe('pk_test_F5UFRy9rcym7iLRTtaH55jGu');
+
+        // Create an instance of Elements.
+        var elements = stripe.elements();
+
+        // Custom styling can be passed to options when creating an Element.
+        // (Note that this demo uses a wider set of styles than the guide below.)
+        var style = {
+            base: {
+                color: '#32325d',
+                lineHeight: '18px',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
+
+        // Create an instance of the card Element.
+        var card = elements.create('card', { style: style });
+
+        // Add an instance of the card Element into the `card-element` <div>.
+        card.mount('#div2');
+
+        // Handle real-time validation errors from the card Element.
+        card.addEventListener('change', function (event) {
+            var displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // Handle form submission.
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            stripe.createToken(card).then(function (result) {
+                if (result.error) {
+                    // Inform the user if there was an error.
+                    var errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                } else {
+                    // Send the token to your server.
+                    stripeTokenHandler(result.token);
+                }
+            });
+        });
+
+        function stripeTokenHandler(token) {
+            // Insert the token ID into the form so it gets submitted to the server
+            var form = document.getElementById('payment-form');
+            var hiddenInput = document.createElement('input');
+            hiddenInput.setAttribute('type', 'hidden');
+            hiddenInput.setAttribute('name', 'stripeToken');
+            hiddenInput.setAttribute('value', token.id);
+            form.appendChild(hiddenInput);
+            // Submit the form
+            form.submit();
+        }
+    }
+    function show3() {
+        document.getElementById('div1').style.display = 'none';
+        document.getElementById('div2').style.display = 'none';
+        document.getElementById('div3').style.display = 'block';
+        var addHtml = `
+        <div class="form-group">
+                            <label for="exampleInputPassword1">Credit Card no.</label>
+                            <input ttype="text" id="cc" name="cc" placeholder="Credit Card Number" class="form-control">
+                            <input ttype="text" id="cc" name="pay" value=".net"  class="form-control" hidden>
+        </div>
+        <div class="form-group">
+                            <label for="exampleInputPassword1">CVV no.</label>
+                            <input ttype="text" id="cc" name="cvv" placeholder="CVV" class="form-control">
+        </div>
+        <div class="form-group">
+                            <label for="exampleInputPassword1">Expiration date</label>
+                            <input ttype="text" id="cc" name="expire" placeholder="Expiration date (mmyy)" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Pay</button>
+        `
+        document.getElementById('div3').innerHTML = addHtml
+    }
+
+</script>
+<script>
+
+
 </script>
 
 </html>
