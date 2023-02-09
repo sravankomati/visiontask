@@ -11,11 +11,11 @@ module.exports = {
       if (checkEmail) {
         res.json({ err: "Email is alreday exist" });
       } else {
-        // await Studentmodel.create({
-        //   StudentName,
-        //   Email,
-        //   Password: PasswordGenearte,
-        // });
+        await Studentmodel.create({
+          StudentName,
+          Email,
+          Password: PasswordGenearte,
+        });
         res.json({ message: "student is Register, you can login now " });
       }
     } catch (error) {

@@ -1,4 +1,5 @@
 const validator = require("validator");
+require("dotenv").config();
 const paymentSchema = require("../model/paymentSchema");
 const ApiContracts = require("authorizenet").APIContracts;
 const ApiControllers = require("authorizenet").APIControllers;
@@ -52,8 +53,8 @@ module.exports = {
 
     const merchantAuthenticationType =
       new ApiContracts.MerchantAuthenticationType();
-    merchantAuthenticationType.setName("2Z6879nZrUD");
-    merchantAuthenticationType.setTransactionKey("7fU2y5S8se4k4Bzq");
+    merchantAuthenticationType.setName(process.env.netLoginid);
+    merchantAuthenticationType.setTransactionKey(process.env.nettransectionid);
 
     const creditCard = new ApiContracts.CreditCardType();
     creditCard.setCardNumber(cc);
@@ -99,7 +100,7 @@ module.exports = {
           ApiContracts.MessageTypeEnum.OK
         ) {
           if (response.getTransactionResponse().getMessages() !== null) {
-            console.log(apiResponse);
+            // console.log(apiResponse);
             await paymentSchema.create({
               username: req.body.username,
               currency: "USD",

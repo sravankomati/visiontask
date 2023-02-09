@@ -1,11 +1,11 @@
 const express = require("express");
 const paypal = require("paypal-rest-sdk");
+require("dotenv").config();
 const paymentSchema = require("../model/paymentSchema");
-var Publishable_Key = "pk_test_F5UFRy9rcym7iLRTtaH55jGu";
-const stripe = require("stripe")("sk_test_Czcmd6nNU3pu0sUjKGT3TYAf");
+var Publishable_Key = process.env.stripePublishable_Key;
+const stripe = require("stripe")(process.env.stripeSecrate_Key);
 const { authorizePay } = require("../middleware/validator");
 
-require("dotenv").config();
 
 const Router = express.Router();
 paypal.configure({
